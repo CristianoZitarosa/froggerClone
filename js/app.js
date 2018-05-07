@@ -61,23 +61,24 @@ class Character {
 * Main parameters are x and y position on canvas and the image.
 **/
 class Log extends Character {
-  constructor(x, y, sprite) {
+  constructor(x, y, sprite, speed) {
     super(x, y, sprite);
     this.x = x;
     this.y = y;
     this.sprite = sprite;
+    this.speed = speed;
   }
   update(dt) {
     /* sets speed and direction (right) of external logs rows or resets a log */
     if (this.y !== 223) {
       if (this.x < canvasWidth) {
-        this.x += 200*dt;
+        this.x += this.speed * dt;
       } else { this.x = -40; }
     }
     /* sets speed and direction (left) of central logs rows or resets a log */
     if (this.y === 223){
       if (this.x > -100){
-        this.x -= 200*dt;
+        this.x -= this.speed * dt;
       } else { this.x = 550; }
     }
     /* Player-Log collision check */
@@ -103,12 +104,12 @@ class Log extends Character {
 /**
 * All the enemies and an array containing them.
 **/
-const log1 = new Log(504, 140, 'images/log.png');//0.140
-const log2 = new Log(0, 223, 'images/log.png');//103.223
-const log3 = new Log(101, 306, 'images/log.png');//202.306
-const log4 = new Log(202, 140, 'images/log.png');//202.140
-const log5 = new Log(305, 223, 'images/log.png');//305.223
-const log6 = new Log(404, 306, 'images/log.png');//404.306
+const log1 = new Log(504, 140, 'images/log.png', 200);
+const log2 = new Log(0, 223, 'images/log.png', 200);
+const log3 = new Log(101, 306, 'images/log.png', 200);
+const log4 = new Log(202, 140, 'images/log.png', 200);
+const log5 = new Log(305, 223, 'images/log.png', 200);
+const log6 = new Log(404, 306, 'images/log.png', 200);
 
 const allLogs = [log1, log2, log3, log4, log5, log6];
 
@@ -117,24 +118,25 @@ const allLogs = [log1, log2, log3, log4, log5, log6];
 * Main parameters are x and y position on canvas and the image.
 **/
 class Car extends Character {
-  constructor(x, y, sprite) {
+  constructor(x, y, sprite, speed) {
     super(x, y, sprite);
     this.x = x;
     this.y = y;
     this.sprite = sprite;
+    this.speed = speed;
   }
 
   update(dt) {
     /* sets speed and direction (right) of top row or resets a Car */
     if (this.y === 476) {
       if (this.x <= canvasWidth) {
-        this.x += 150*dt;
+        this.x += this.speed * dt;
       } else { this.x = -100; }
     }
     /* sets speed and direction (left) of bottom row or resets a Car */
     if (this.y === 559) {
       if (this.x >= -100) {
-        this.x -= 200*dt;
+        this.x -= this.speed * dt;
       } else { this.x = 600; }
     }
     /* Player-Car collision check */
@@ -152,10 +154,10 @@ class Car extends Character {
 /**
 * All the Cars and an array containing them.
 **/
-const car1 = new Car(30, 476, 'images/red-car.png');
-const car2 = new Car(300, 476, 'images/green-car.png');
-const car3 = new Car(50, 559, 'images/yellow-car.png');
-const car4 = new Car(350, 559, 'images/blue-car.png');
+const car1 = new Car(30, 476, 'images/red-car.png', 200);
+const car2 = new Car(300, 476, 'images/green-car.png', 200);
+const car3 = new Car(50, 559, 'images/yellow-car.png', 150);
+const car4 = new Car(350, 559, 'images/blue-car.png', 150);
 
 const allCars = [car1, car2, car3, car4];
 
@@ -195,37 +197,35 @@ class Player extends Character {
   }
 
   handleInput(pressedKeys) {
+
     /* If the keyboard is set to locked, prevents further key press */
-    if (locked) {
-      return;
-    } else {
-      /* Otherwise moves the player and sets canvas' limits */
-      if (pressedKeys) {
-        jump.currentTime = 0;
-        jump.play();
+    if (locked) return;
+    /* Otherwise moves the player and sets canvas' limits */
+    if (pressedKeys) {
+      jump.currentTime = 0;
+      jump.play();
 
-        if (pressedKeys === 'left' && this.x > 33) {
-          this.x -= 100;
-        }
-        else if (pressedKeys === 'up' && this.y > 60) {
-          this.y -= 83;
-        }
-        else if (pressedKeys === 'right' && this.x < 400) {
-          this.x += 100;
-        }
-        else if (pressedKeys === 'down' && this.y < 561) {
-          this.y += 83;
-        }
-        /* If the player reaches the top, points lives and lap are updated */
-        if (this.y < 83) {
-          this.score += 50;
-          this.lives++;
-          lap++;
-          repositionFrog();
-        }
-
+      if (pressedKeys === 'left' && this.x > 33) {
+        this.x -= 100;
+      }
+      else if (pressedKeys === 'up' && this.y > 60) {
+        this.y -= 83;
+      }
+      else if (pressedKeys === 'right' && this.x < 400) {
+        this.x += 100;
+      }
+      else if (pressedKeys === 'down' && this.y < 561) {
+        this.y += 83;
+      }
+      /* If the player reaches the top, points lives and lap are updated */
+      if (this.y < 83) {
+        this.score += 50;
+        this.lives++;
+        lap++;
+        repositionFrog();
       }
     }
+
   }
 }
 
@@ -254,7 +254,6 @@ document.addEventListener('keyup', function(e) {
 * It is played a music for the game just won.
 **/
 function endGame() {
-  cleanModal();
   stopMusic();
   win.play();
   modal.style.display = "block";
@@ -268,7 +267,6 @@ function endGame() {
 * It is played a music for the game failed to win.
 **/
 function gameOver() {
-  cleanModal();
   stopMusic();
   loose.play();
   modal.style.display = "block";
@@ -281,15 +279,6 @@ function gameOver() {
 function stopMusic() {
   traffic.pause();
   loop.pause();
-}
-
-/**
-* This function is called to clean the modal.
-**/
-function cleanModal() {
-  while (modalContent.firstChild) {
-    modalContent.removeChild(modalContent.firstChild);
-  }
 }
 
 /**
