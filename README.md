@@ -60,6 +60,10 @@ To run this app is it possible either:
 
 - Canvas blocks from Udacity;
 
+- Road blocks, original stone block from Udacity, altered by me;
+
+- Cars and frog made by me;
+
 - Other images from:
 http://www.iconarchive.com/
 

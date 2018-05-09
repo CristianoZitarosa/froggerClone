@@ -82,20 +82,18 @@ class Log extends Character {
       } else { this.x = 550; }
     }
     /* Player-Log collision check */
-    if (player.y < 332 && player.y > 80) { /* if player is on water */
-      if (this.x + 101 >= player.x &&
-          this.x <= player.x + 60 &&
-          this.y - 66 <= player.y &&
-          this.y >= player.y - 60) { /* if Player-Log collision happens */
-            /* until player is on canvas borders */
-            if (player.x > 0 && player.x < canvasWidth) {
-              player.x = this.x + 23; /* player floats */
-              floating = true;
-            } else { /* player outside the canvas -1 life, position reset*/
-              player.x = 222; player.y = 640;
-              checkLives();
-            }
-      } else { floating = false; } /* else, player not colliding a log */
+    if (onWater(player.y)) {
+      for (let i = 0; i < allLogs.length; i++) {
+        if ( collision(player.x,player.y,60,60, allLogs[i].x, allLogs[i].y,101,60) ) {
+          if (onCanvas(player.x)) {
+          player.x = allLogs[i].x + 23;
+        } else {
+          player.x = 222;
+          player.y = 640;
+          checkLives();
+          }
+        }
+      }
     }
 
   }
@@ -140,11 +138,8 @@ class Car extends Character {
       } else { this.x = 600; }
     }
     /* Player-Car collision check */
-    if (this.x + 101 >= player.x &&
-        this.x <= player.x + 60 &&
-        this.y - 66 <= player.y &&
-        this.y >= player.y - 60) { /* If Player-Car collision happens */
-          /* -1 life, position reset */
+    if (collision(player.x, player.y, 60, 60, this.x, this.y, 101, 66)) {
+      /* If Player-Car collision happens -1 life, position reset */
           player.x = 222; player.y = 640;
           checkLives();
     }
@@ -228,6 +223,24 @@ class Player extends Character {
 
   }
 }
+/**
+(Px, Py, Pw, Ph, Ex, Ey, Ew, Eh) ===
+(player.x, player.y,playerWidth,playerHeight,element.x,element.y, elementWidth,elementHeight)
+**/
+let collision = function(Px, Py, Pw, Ph, Ex, Ey, Ew, Eh) {
+  /* returns true if player collides an object */
+  return (Ex + Ew >= Px && Ex <= Px + Pw && Ey - Eh <= Py && Ey >= Py - Ph);
+};
+
+let onWater = function(y) {
+  /* true if player is on water ( water vertical borders: 80 < water < 332 )*/
+  return (y < 332 && y > 80);
+};
+
+let  onCanvas = function(x) {
+  /* true if player is on canvas ( canvas horizontal borders: 0 < canvas < canvasWidth )*/
+  return (x > 0 && x < canvasWidth);
+};
 
 /**
 * The player.
@@ -309,6 +322,7 @@ function repositionFrog() {
 * If Player loose all lives the game is ended.
 **/
 function checkLives() {
+  locked = true;
   jump.pause();
   ouch.currentTime = 0;
   ouch.play();
@@ -321,4 +335,7 @@ function checkLives() {
     document.location.reload();
     };
   }
+  setTimeout( () => {
+    locked = false;
+  }, 1000);
 }
