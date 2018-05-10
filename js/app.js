@@ -11,13 +11,12 @@ const jump = document.querySelector("#jump");
 const success = document.querySelector("#success");
 const ouch = document.querySelector("#ouch");
 const win = document.querySelector("#win");
-const loose = document.querySelector("#loose");
+const lose = document.querySelector("#lose");
 traffic.loop = true;
 loop.loop = true;
 /* variables */
 const modalContent = document.querySelector('.modal-content');
 const modal = document.querySelector('.modal');
-let floating = false;
 let lap = 0;
 let locked = false;
 
@@ -26,7 +25,7 @@ let locked = false;
 * This modal is used to inform the player about rules and how to play.
 **/
 (function openingModal() {
-  modalContent.innerHTML = '<h1 class="centered">Welcome to the Frogger clone!</h1><h3>Rules are simple:</h3><ul> <li>Avoid Cars;</li><li>Avoid Water;</li><li><strong>Reach the top to gain +1 life and +50 points</strong>;</li><li><strong>Game is won if  the top is reached 5 times!</strong></li><li>3 lifes:<ul><li>hit the car loose a life;</li><li>splash into the water and loose a life;</li><li>go out of the screen... and yes loose a life;</li></ul> </li><li>Use the floating Logs to pass the river;</li><li>Grass is a safe place to have some rest.</li><li><strong>Bonus, only if the game is won, points are multiplied by lives saved!!!</strong></li></ul><h2 class="centered">Move the frog by arrow keys. Have fun!</h2><button class="close button centered">PLAY!</button>';
+  modalContent.innerHTML = '<h1 class="centered">Welcome to the Frogger clone!</h1><h3>Rules are simple:</h3><ul> <li>Avoid Cars;</li><li>Avoid Water;</li><li><strong>Reach the top to gain +1 life and +50 points</strong>;</li><li><strong>Game is won if  the top is reached 5 times!</strong></li><li>3 lifes:<ul><li>hit the car and lose a life;</li><li>splash into the water and lose a life;</li><li>go out of the screen... and yes lose a life;</li></ul> </li><li>Use the floating Logs to pass the river;</li><li>Grass is a safe place to have some rest.</li><li><strong>Bonus, only if the game is won, points are multiplied by lives saved!!!</strong></li></ul><h2 class="centered">Move the frog by arrow keys. Have fun!</h2><button class="close button centered">PLAY!</button>';
 })();
 
 /**
@@ -82,17 +81,34 @@ class Log extends Character {
       } else { this.x = 550; }
     }
     /* Player-Log collision check */
-    if (onWater(player.y)) {
-      for (let i = 0; i < allLogs.length; i++) {
-        if ( collision(player.x,player.y,60,60, allLogs[i].x, allLogs[i].y,101,60) ) {
-          if (onCanvas(player.x)) {
-          player.x = allLogs[i].x + 23;
-        } else {
-          player.x = 222;
-          player.y = 640;
-          checkLives();
-          }
-        }
+    if (player.y === 142) {
+      if (collision(player.x,player.y,60,60,log1.x,log1.y,101,60)) {
+        player.x = log1.x + 23;
+      } else if (collision(player.x,player.y,60,60,log4.x,log4.y,101,60)) {
+        player.x = log4.x + 23;
+      } else {
+        repositionFrog();
+        checkLives();
+      }
+    }
+    if (player.y === 225) {
+      if (collision(player.x,player.y,60,60,log2.x,log2.y,101,60)) {
+        player.x = log2.x + 23;
+      } else if (collision(player.x,player.y,60,60,log5.x,log5.y,101,60)) {
+        player.x = log5.x + 23;
+      } else {
+        repositionFrog();
+        checkLives();
+      }
+    }
+    if (player.y === 308) {
+      if (collision(player.x,player.y,60,60,log3.x,log3.y,101,60)) {
+        player.x = log3.x + 23;
+      } else if (collision(player.x,player.y,60,60,log6.x,log6.y,101,60)) {
+        player.x = log6.x + 23;
+      } else {
+        repositionFrog();
+        checkLives();
       }
     }
 
@@ -140,7 +156,7 @@ class Car extends Character {
     /* Player-Car collision check */
     if (collision(player.x, player.y, 60, 60, this.x, this.y, 101, 66)) {
       /* If Player-Car collision happens -1 life, position reset */
-          player.x = 222; player.y = 640;
+          repositionFrog();
           checkLives();
     }
   }
@@ -174,11 +190,12 @@ class Player extends Character {
   update(dt) {
     /**
     * This code is used to center the frog on the block when
-    *    jups out of the Log and reaches the top.
+    *    he jumps out of the log to prevent a weird horizontal position.
+    * The check is active on 2 rows close to water.
     **/
-    if (this.y < 83) { /* if Player reaches the top */
-      if (this.x > 0 && this.x < 101) { /* Player's position between first column borders */
-        this.x = 20; /* Center its position */
+    if (this.y === 391 || this.y === 59) {
+      if (this.x > 0 && this.x < 101) { /* Player's between column borders */
+        this.x = 20; /* Position centered */
       } else if (this.x > 101 && this.x < 202) {
         this.x = 121;
       } else if (this.x > 202 && this.x < 302) {
@@ -217,30 +234,12 @@ class Player extends Character {
         this.score += 50;
         this.lives++;
         lap++;
-        repositionFrog();
+        checkLap();
       }
     }
 
   }
 }
-/**
-(Px, Py, Pw, Ph, Ex, Ey, Ew, Eh) ===
-(player.x, player.y,playerWidth,playerHeight,element.x,element.y, elementWidth,elementHeight)
-**/
-let collision = function(Px, Py, Pw, Ph, Ex, Ey, Ew, Eh) {
-  /* returns true if player collides an object */
-  return (Ex + Ew >= Px && Ex <= Px + Pw && Ey - Eh <= Py && Ey >= Py - Ph);
-};
-
-let onWater = function(y) {
-  /* true if player is on water ( water vertical borders: 80 < water < 332 )*/
-  return (y < 332 && y > 80);
-};
-
-let  onCanvas = function(x) {
-  /* true if player is on canvas ( canvas horizontal borders: 0 < canvas < canvasWidth )*/
-  return (x > 0 && x < canvasWidth);
-};
 
 /**
 * The player.
@@ -262,11 +261,21 @@ document.addEventListener('keyup', function(e) {
 });
 
 /**
+* The function that handles collision between frog and an element (a car or a log)
+* (Px, Py, Pw, Ph, Ex, Ey, Ew, Eh) ===
+* (player.x, player.y,playerWidth,playerHeight,element.x,element.y,elementWidth,elementHeight)
+**/
+let collision = function(Px, Py, Pw, Ph, Ex, Ey, Ew, Eh) {
+  /* returns true if player collides an object */
+  return (Ex + Ew >= Px && Ex <= Px + Pw && Ey - Eh <= Py && Ey >= Py - Ph);
+};
+
+/**
 * This function is called when the game is won.
 * The modal is cleaned and filled with a victory message and a brief recap.
 * It is played a music for the game just won.
 **/
-function endGame() {
+function winGame() {
   stopMusic();
   win.play();
   modal.style.display = "block";
@@ -279,9 +288,9 @@ function endGame() {
 *   recap.
 * It is played a music for the game failed to win.
 **/
-function gameOver() {
+function loseGame() {
   stopMusic();
-  loose.play();
+  lose.play();
   modal.style.display = "block";
   modalContent.innerHTML = `<h1 class="centered">Game Over!</h1><h3 class="centered">You have lost all lives and collected ${player.score} points!</h3><button class="restart button centered">RESTART!</button>`;
 }
@@ -295,22 +304,28 @@ function stopMusic() {
 }
 
 /**
-* This function resets player's position after a visit to the top after a delay.
-* If the game is won the game is ended.
+* This function is called to pause the 'jump' sound to prevent an overlap
+*   with the 'ouch' sound played if the frog loses 1 life.
 **/
-function repositionFrog() {
+function switchSound() {
+  jump.pause();
+  ouch.play();
+}
+
+/**
+* This function checks player's laps after a visit to the top.
+* The game is won with 5 visits, else the player starts again from bottom.
+**/
+function checkLap() {
   if (lap === 5) { /*If the game is won */
     locked = true;
-    endGame();
-    const restartGame = document.querySelector('.restart');
-    restartGame.onclick = function() {
-    document.location.reload();
-    };
+    winGame();
+    restartButton();
   } else {
     locked = true;
     setTimeout( () => {
       window.scrollTo(0, 500);
-      player.y = 640;
+      repositionFrog();
       locked = false;
     }, 1500);
     success.play();
@@ -318,24 +333,38 @@ function repositionFrog() {
 }
 
 /**
+* This function resets player's current position to start position.
+**/
+function repositionFrog() {
+  player.x = 222;
+  player.y = 640;
+}
+
+/**
 * This function counts player's lives.
-* If Player loose all lives the game is ended.
+* If Frog loses all lives the game is ended.
 **/
 function checkLives() {
   locked = true;
-  jump.pause();
-  ouch.currentTime = 0;
-  ouch.play();
+  switchSound();
   player.lives--;
   if (player.lives === 0) {
     locked = true;
-    gameOver();
-    const restartGame = document.querySelector('.restart');
-    restartGame.onclick = function() {
-    document.location.reload();
-    };
+    loseGame();
+    restartButton();
   }
   setTimeout( () => {
     locked = false;
   }, 1000);
+}
+
+/**
+* This function is called to set a listener on the restart button
+*   once the button is built if needed.
+**/
+function restartButton() {
+    const restartGame = document.querySelector('.restart');
+    restartGame.onclick = function() {
+      document.location.reload();
+    };
 }

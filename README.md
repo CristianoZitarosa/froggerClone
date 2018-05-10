@@ -6,7 +6,6 @@
 ## Index
 * Task;
 * Brief introduction;
-* Issue to fix;
 * How to run this application;
 * New skills applied from the Module;
 * Required features;
@@ -25,14 +24,10 @@ The student is provided of visual assets and a game loop engine. Using these too
 
 ### Brief introduction
 
-In this game you have a Player and a few Enemies. The goal of the player is to reach the top, without colliding into any one of the enemies and without splash into the water.
-The player can move left, right, up and down by the arrow keys. The enemies move in varying speeds on their portion of the scene.
+In this game you play as the Frog and your goal is to reach the top, without colliding any Car and without to splash into the water otherwise you lose 1 life and the Frog comes again to the initial position.
+The Frog can move left, right, up and down by the arrow keys.
 
-Once the player collides with an enemy, the player looses 1 life and moves back to the start square. When the top is reached, 1 life and 50 points are added to the player. The game is won with 5 visits to the top, if so points are multiplied by lives saved.
-
-### Issue to fix
-
-When the frog jumps on water either from terrain or from a log does not loose 1 life.
+When the top is reached, 1 life and 50 points are added. The game is won with 5 visits to the top, and if won points are multiplied by lives saved.
 
 ### How to run this application
 
@@ -51,19 +46,16 @@ To run this app is it possible either:
 
 * Extended game design to reproduce original Frogger game;
 * Cars as enemies instead of bugs;
-* Floating logs to pass the river;
-* Road blocks, frog and cars designed by me;
+* Floating Logs to pass the river;
+* Road blocks, Frog and Cars designed by me;
 * Music;
 * Lives, points, ending game management.
 
 ### Images credits:
 
 - Canvas blocks from Udacity;
-
 - Road blocks, original stone block from Udacity, altered by me;
-
-- Cars and frog made by me;
-
+- Cars, Logs and Frog designed by me;
 - Other images from:
 http://www.iconarchive.com/
 
